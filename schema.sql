@@ -22,6 +22,8 @@ CREATE TABLE role(
 CREATE TABLE department(
    id INTEGER(4) AUTO_INCREMENT NOT NULL,
    name VARCHAR(30),
+   manager VARCHAR(30) NULL,
+   managers_id INTEGER(3) NOT NULL,
    PRIMARY KEY(id) 
 
 );
@@ -56,8 +58,6 @@ VALUES("Engineer", 120000, 1);
 INSERT INTO role(title, salary, department_id)
 VALUES("Business analyst", 100000, 3);
 
-INSERT INTO role(title, salary, department_id)
-VALUES ("Manager", 150000);
 
 INSERT INTO role (title, salary,department_id)
 VALUES ("Other", 60000, 3);
@@ -65,20 +65,20 @@ VALUES ("Other", 60000, 3);
 
 /**Inserting data into department*/
 
-INSERT INTO department(name)
-VALUES ("Engineering");
+INSERT INTO department(name, manager, managers_id)
+VALUES ("Engineering", "Gary Almes", 1);
 
-INSERT INTO department(name)
-VALUES("Sales");
+INSERT INTO department(name, manager, managers_id)
+VALUES("Sales", "N/A", 2);
 
-INSERT INTO department(name)
-VALUES ("Business Development");
+INSERT INTO department(name, manager, managers_id)
+VALUES ("Business Development", "N/A", 3);
 
 
 /**Showing list of all employees: first name, last name, title, department, salary)**/
 
 
-SELECT firstname, lastname, title, department, salary
+SELECT firstname, lastname, title, name, salary, manager
 FROM employees
 INNER JOIN role ON employees.role_id= role.id
 INNER JOIN department ON role.department_id = department.id;
