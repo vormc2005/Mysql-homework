@@ -42,7 +42,7 @@ onStart = () => {
         'View All Employees by Department',
         'View All Employees by Manager',         
          'Update employee roles',
-         'Add role',
+         'Add employee',
          'Add department',
          'Remove employee',
          'Update employee manager',
@@ -80,8 +80,10 @@ onStart = () => {
 
         /*View all Employees by manager*/
 
-      }else if (answers.userChoice === 'Add role'){
-        console.log('Add role - success')
+      }else if (answers.userChoice === 'Add employee'){
+        console.log('Add employee - success')
+        AddEmployee();
+        onStart();
       }
       else if (answers.userChoice === 'Add department'){
         console.log('Add department - success')
@@ -126,16 +128,103 @@ viewByDepartment =()=>{
   viewByManager =()=>{
     connection.query("SELECT firstname, lastname, name, manager FROM employees LEFT JOIN department ON employees.manager_id = managers_id", function(err, response) {
           if (err) throw err;
-          console.table(response); 
-           
+          console.table(response);            
          
     });
   };
-
+//********************************** */
   updateRoles=()=>{
-    
+
+  connection.query("SELECT * FROM employees", function(err, results){
+    if(err) throw err;
+
+    inquirer.
+        prompt([{
+          name:"choice",
+          type:"rawlist",
+          choices: function(){
+            var choiceArray =[];
+            for (var i=0; i < results.length; i++){
+              choiceArray.push(results[i].lastname);
+            }
+            return choiceArray;
+          },
+          message:"Please choose last name of the person"
+        },
+        {
+          type:"input",
+          name:"newRoleId",
+          message:"Type new role ID"
+        }
+      ])
+      .then (function(answer){
+        var chosenLast;
+        for (var i=0; i<results.length; i++){
+          if(results[i].lastname===answer.choice){
+            chosenLast = results[i];
+          }
+        }
+
+
+      })
+  })    
 
   }
+//********************************* */
+  AddEmployee =()=>{
+    console.log("Let's add employee")
+    inquirer
+      .prompt([
+        {
+          type:"input",
+          message:"Please enter first name",
+          name:"first"
+        },
+        {
+          type:"input",
+          message:"Please enter last name",
+          name:"last"
+        },
+        {
+          type:"input",
+          message:"Please enter role id",
+          name:"roleId",
+          validate: function(value){
+            if(isNaN(value)===false){
+              return true;
+            }
+            return false;
+          }
+        },
+        {
+          type:"input",
+          message:"Please enter manager's id",
+          name:"managersId",
+          validate: function(value){
+            if(isNaN(value)===false){
+              return true;
+            }
+            return false;
+          }
+        }
+      ])
+      .then(function(response){
+        connection.query(
+          "INSERT INTO employees SET ?",
+          {
+            firstname: response.first,
+            lastname:response.last,
+            role_id:response.roleId,
+            manager_id:response.managersId || 0
+          },
+          function(err){
+            if (err) throw err;
+            console.log("Your new employee was added successfully!")
+          }
+        );
+      });
+  };
+  
 
 
 endOfUse =()=>{
